@@ -16,11 +16,19 @@ public class NetworkedClient : MonoBehaviour
     byte error;
     bool isConnected = false;
     int ourClientID;
-
+    GameObject gameSystemManager;
     // Start is called before the first frame update
     void Start()
     {
-        Connect();
+        GameObject[] allobjects = FindObjectsOfType<GameObject>();
+        foreach (GameObject go in allobjects)
+        {
+            if (go.GetComponent<GameSystemManager>()!=null)
+            {
+                gameSystemManager = go;
+            }
+        }
+            Connect();
     }
 
     // Update is called once per frame
@@ -109,13 +117,34 @@ public class NetworkedClient : MonoBehaviour
         string[] csv = msg.Split(',');
         int signifier = int.Parse(csv[0]);
         if (signifier == ServerToClientSignifiers.LoginComplete)
+        {
             Debug.Log("Login successful");
+            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.MainMenu);
+        }
         else if (signifier == ServerToClientSignifiers.LoginFailed)
             Debug.Log("Login Failed");
         else if (signifier == ServerToClientSignifiers.AccountCreationComplete)
+        {
             Debug.Log("account creation successful");
+            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.MainMenu);
+        }
         else if (signifier == ServerToClientSignifiers.AccountCreationFailed)
             Debug.Log("Account creation failed");
+        else if (signifier == ServerToClientSignifiers.OpponentPlay)
+        {
+            //waiting for other player
+            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.WaitingForPlayer);
+        }
+        //else if (signifier == ServerToClientSignifiers.JoinedPlayAsOpponent)
+        //{
+        //    //waiting for other player
+        //    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.);
+        //}
+        else if (signifier == ServerToClientSignifiers.GameStart)
+        { 
+            Debug.Log("Opponent player: " + csv[1]);
+            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+        }
     }
 
     public bool IsConnected()
@@ -129,6 +158,8 @@ public static class ClientToServerSignifiers
 {
     public const int CreateAccount = 1;
     public const int Login = 2;
+    public const int JoinGammeRoomQueue = 3;
+    public const int PlayGame = 4;
 }
 public static class ServerToClientSignifiers
 {
@@ -136,5 +167,7 @@ public static class ServerToClientSignifiers
     public const int LoginFailed = 2;
     public const int AccountCreationComplete = 3;
     public const int AccountCreationFailed = 4;
+    public const int OpponentPlay = 5;
+    public const int GameStart = 6;
     
 }
