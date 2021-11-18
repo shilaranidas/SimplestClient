@@ -12,7 +12,7 @@ public class NetworkedClient : MonoBehaviour
     int reliableChannelID;
     int unreliableChannelID;
     int hostID;
-    int socketPort = 5491;
+    int socketPort = 5491;//5492
     byte error;
     bool isConnected = false;
     int ourClientID;
@@ -113,4 +113,17 @@ public class NetworkedClient : MonoBehaviour
     }
 
 
+}
+public static class ClientToServerSignifiers
+{
+    public const int CreateAccount = 1;
+    public const int Login = 2;
+}
+public static class ServerToClientSignifiers
+{
+    public const int LoginComplete = 1;
+    public const int LoginFailed = 2;
+    public const int AccountCreationComplete = 3;
+    public const int AccountCreationFailed = 4;
+    
 }
