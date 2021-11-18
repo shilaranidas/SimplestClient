@@ -53,7 +53,7 @@ public class NetworkedClient : MonoBehaviour
                 case NetworkEventType.DataEvent:
                     string msg = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
                     ProcessRecievedMsg(msg, recConnectionID);
-                    //Debug.Log("got msg = " + msg);
+                    Debug.Log("got msg = " + msg);
                     break;
                 case NetworkEventType.DisconnectEvent:
                     isConnected = false;
@@ -105,6 +105,17 @@ public class NetworkedClient : MonoBehaviour
     private void ProcessRecievedMsg(string msg, int id)
     {
         Debug.Log("msg recieved = " + msg + ".  connection id = " + id);
+        //chk message 
+        string[] csv = msg.Split(',');
+        int signifier = int.Parse(csv[0]);
+        if (signifier == ServerToClientSignifiers.LoginComplete)
+            Debug.Log("Login successful");
+        else if (signifier == ServerToClientSignifiers.LoginFailed)
+            Debug.Log("Login Failed");
+        else if (signifier == ServerToClientSignifiers.AccountCreationComplete)
+            Debug.Log("account creation successful");
+        else if (signifier == ServerToClientSignifiers.AccountCreationFailed)
+            Debug.Log("Account creation failed");
     }
 
     public bool IsConnected()
