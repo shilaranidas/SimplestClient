@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class NetworkedClient : MonoBehaviour
 {
@@ -34,8 +35,8 @@ public class NetworkedClient : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.S))
-            SendMessageToHost("Hello from client");
+       // if(Input.GetKeyDown(KeyCode.S))
+         //   SendMessageToHost("Hello from client");
 
         UpdateNetworkConnection();
     }
@@ -133,7 +134,7 @@ public class NetworkedClient : MonoBehaviour
         else if (signifier == ServerToClientSignifiers.OpponentPlay)
         {
             //waiting for other player
-            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.WaitingForPlayer);
+            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
         }
         //else if (signifier == ServerToClientSignifiers.JoinedPlayAsOpponent)
         //{
@@ -143,6 +144,12 @@ public class NetworkedClient : MonoBehaviour
         else if (signifier == ServerToClientSignifiers.GameStart)
         { 
             Debug.Log("Opponent player: " + csv[1]);
+            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+        }
+        else if(signifier== ServerToClientSignifiers.ReceiveMsg)
+        {
+            Debug.Log("rece" + csv[1]);
+            gameSystemManager.GetComponent<GameSystemManager>().updateChat(csv[1]);
             gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
         }
     }
@@ -160,6 +167,8 @@ public static class ClientToServerSignifiers
     public const int Login = 2;
     public const int JoinGammeRoomQueue = 3;
     public const int PlayGame = 4;
+    public const int SendMsg = 5;
+    public const int SendPrefixMsg = 6;
 }
 public static class ServerToClientSignifiers
 {
@@ -169,5 +178,6 @@ public static class ServerToClientSignifiers
     public const int AccountCreationFailed = 4;
     public const int OpponentPlay = 5;
     public const int GameStart = 6;
-    
+    public const int ReceiveMsg = 7;
+
 }
