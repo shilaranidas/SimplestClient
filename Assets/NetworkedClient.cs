@@ -120,6 +120,7 @@ public class NetworkedClient : MonoBehaviour
         if (signifier == ServerToClientSignifiers.LoginComplete)
         {
             Debug.Log("Login successful");
+            gameSystemManager.GetComponent<GameSystemManager>().updateUserName(csv[1]);
             gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.MainMenu);
         }
         else if (signifier == ServerToClientSignifiers.LoginFailed)
@@ -152,6 +153,12 @@ public class NetworkedClient : MonoBehaviour
             gameSystemManager.GetComponent<GameSystemManager>().updateChat(csv[1]);
             gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
         }
+        else if (signifier == ServerToClientSignifiers.someoneJoinedAsObserver)
+        {
+            gameSystemManager.GetComponent<GameSystemManager>().updateChat("Some one has joined as Observer "+csv[1]);
+            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+        }
+
     }
 
     public bool IsConnected()
@@ -169,6 +176,7 @@ public static class ClientToServerSignifiers
     public const int PlayGame = 4;
     public const int SendMsg = 5;
     public const int SendPrefixMsg = 6;
+    public const int JoinAsObserver = 7;
 }
 public static class ServerToClientSignifiers
 {
@@ -179,5 +187,6 @@ public static class ServerToClientSignifiers
     public const int OpponentPlay = 5;
     public const int GameStart = 6;
     public const int ReceiveMsg = 7;
+    public const int someoneJoinedAsObserver = 8;
 
 }

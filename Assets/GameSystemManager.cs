@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 public class GameSystemManager : MonoBehaviour
 {
-    GameObject btnSubmit, txtUserId, txtPwd, chkCreate,btnJoin,lblU,lblP,btnPlay,lblInfo, gameBoard, txtMsg, btnSend, ddlMsg, chatBox, btnSendPrefixMsg;
-   
+    GameObject btnSubmit, txtUserId, txtPwd, chkCreate,btnJoin,lblU,lblP,lblInfo, gameBoard, txtMsg, btnSend, ddlMsg, chatBox, btnSendPrefixMsg, btnJoinObserver, btnReplay;
+    //,btnPlay
     public GameObject networkedClient;
     List<string> preFixMsg = new List<string> { "hello","test","bye","call you later"};
     //static GameObject instance;
@@ -50,9 +50,9 @@ public class GameSystemManager : MonoBehaviour
             {
                 lblP = go;
             }
-            else if (go.name == "btnPlay")
+            else if (go.name == "btnReplay")
             {
-                btnPlay = go;
+                btnReplay = go;
             }
             //else if (go.name == "gameBoard")
             //    gameBoard = go;
@@ -66,6 +66,8 @@ public class GameSystemManager : MonoBehaviour
                 chatBox = go;
             else if (go.name == "btnSendPrefixMsg")
                 btnSendPrefixMsg = go;
+            else if (go.name == "btnJoinObserver")
+                btnJoinObserver = go;
 
 
 
@@ -73,10 +75,12 @@ public class GameSystemManager : MonoBehaviour
         }
         btnSubmit.GetComponent<Button>().onClick.AddListener(SubmitButtonPressed);
         btnJoin.GetComponent<Button>().onClick.AddListener(JoinButtonPressed);
-        btnPlay.GetComponent<Button>().onClick.AddListener(PlayButtonPressed);
+        btnJoinObserver.GetComponent<Button>().onClick.AddListener(ObserveButtonPressed);
+        btnReplay.GetComponent<Button>().onClick.AddListener(ReplayButtonPressed);
         btnSend.GetComponent<Button>().onClick.AddListener(SendButtonPressed);
         btnSendPrefixMsg.GetComponent<Button>().onClick.AddListener(SendPrefButtonPressed);
         chkCreate.GetComponent<Toggle>().onValueChanged.AddListener(CreateToggleChanged);
+        
         ChangeState(GameStates.LoginMenu);
        
             ddlMsg.GetComponent<Dropdown>().AddOptions(preFixMsg);
@@ -86,6 +90,14 @@ public class GameSystemManager : MonoBehaviour
     public void updateChat(string msg)
     {
         chatBox.GetComponent<Text>().text += msg+"\n";
+    }
+    public void updateUserName(string name)
+    {
+        lblInfo.GetComponent<Text>().text = name;
+    }
+    public void ReplayButtonPressed()
+    {
+
     }
     // Update is called once per frame
     void Update()
@@ -123,6 +135,12 @@ public class GameSystemManager : MonoBehaviour
         networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(msg);
         ChangeState(GameStates.TicTacToe);
     }
+    public void ObserveButtonPressed()
+    {
+        string msg = ClientToServerSignifiers.JoinAsObserver + "";
+        networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(msg);
+        ChangeState(GameStates.Observer);
+    }
     public void CreateToggleChanged(bool newValue)
     {
 
@@ -143,13 +161,14 @@ public class GameSystemManager : MonoBehaviour
         txtUserId.SetActive(false);
         lblU.SetActive(false);
         lblP.SetActive(false);
-        btnPlay.SetActive(false);
+        //btnPlay.SetActive(false);
         //txtMsg, btnSend, ddlMsg, chatBox, btnSendPrefixMsg
         txtMsg.SetActive(false);
         btnSend.SetActive(false);
         ddlMsg.SetActive(false);
         chatBox.SetActive(false);
         btnSendPrefixMsg.SetActive(false);
+        btnJoinObserver.SetActive(false);
         if (newState == GameStates.LoginMenu)
         {
             btnSubmit.SetActive(true);
@@ -162,14 +181,14 @@ public class GameSystemManager : MonoBehaviour
         else if (newState == GameStates.MainMenu)
         {
             btnJoin.SetActive(true);
-
+            
 
             txtMsg.SetActive(true);
             btnSend.SetActive(true);
             ddlMsg.SetActive(true);
             chatBox.SetActive(true);
             btnSendPrefixMsg.SetActive(true);
-
+            btnJoinObserver.SetActive(true);
         }
         else if (newState == GameStates.WaitingInQueue)
         {
@@ -180,12 +199,16 @@ public class GameSystemManager : MonoBehaviour
         }
         else if (newState == GameStates.TicTacToe)
         {
-            btnPlay.SetActive(true);
+            //btnPlay.SetActive(true);
             txtMsg.SetActive(true);
             btnSend.SetActive(true);
             ddlMsg.SetActive(true);
             chatBox.SetActive(true);
             btnSendPrefixMsg.SetActive(true);
+        }
+        else if (newState==GameStates.Observer)
+        {
+            chatBox.SetActive(true);         
         }
     }
 
@@ -199,4 +222,5 @@ static public class GameStates
     public const int TicTacToe = 4;
     public const int WaitingForPlayer = 5;
     public const int Running = 6;
+    public const int Observer = 7;
 }
