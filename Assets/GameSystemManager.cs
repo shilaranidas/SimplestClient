@@ -9,6 +9,7 @@ public class GameSystemManager : MonoBehaviour
     GameObject btnSubmit, txtUserId, txtPwd, chkCreate,btnJoin,lblU,lblP,btnPlay,lblInfo, gameBoard, txtMsg, btnSend, ddlMsg, chatBox, btnSendPrefixMsg;
    
     public GameObject networkedClient;
+    List<string> preFixMsg = new List<string> { "hello","test","bye","call you later"};
     //static GameObject instance;
     // Start is called before the first frame update
     void Start()
@@ -77,6 +78,10 @@ public class GameSystemManager : MonoBehaviour
         btnSendPrefixMsg.GetComponent<Button>().onClick.AddListener(SendPrefButtonPressed);
         chkCreate.GetComponent<Toggle>().onValueChanged.AddListener(CreateToggleChanged);
         ChangeState(GameStates.LoginMenu);
+       
+            ddlMsg.GetComponent<Dropdown>().AddOptions(preFixMsg);
+        
+       
     }
     public void updateChat(string msg)
     {
