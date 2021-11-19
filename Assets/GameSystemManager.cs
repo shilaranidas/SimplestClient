@@ -89,7 +89,7 @@ public class GameSystemManager : MonoBehaviour
     }
     public void SendPrefButtonPressed()
     {
-        string msg = ClientToServerSignifiers .SendPrefixMsg+","+ ddlMsg.GetComponent<Dropdown>().itemText.ToString();
+        string msg = ClientToServerSignifiers .SendPrefixMsg+","+ ddlMsg.GetComponent<Dropdown>().options[ddlMsg.GetComponent<Dropdown>().value].text.ToString();
         networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(msg);
         Debug.Log("send" + msg);
     }
