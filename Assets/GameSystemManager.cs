@@ -8,9 +8,10 @@ public class GameSystemManager : MonoBehaviour
 {
     GameObject btnSubmit, txtUserId, txtPwd, chkCreate,btnJoin,lblU,lblP,lblInfo, gameBoard, txtMsg, btnSend, ddlMsg, chatBox, pnlChat, btnSendPrefixMsg, btnJoinObserver, btnReplay,ddlPlayer;
     //,btnPlay
-    GameObject txtCMsg, btnCSend,LoginSys,MsgSend,PMsgSend, C2C, JoinSys;
+    GameObject txtCMsg, btnCSend,LoginSys,MsgSend,PMsgSend, C2C, JoinSys,txtReplay,pnlReplay;
     public GameObject networkedClient;
     string currentPlayerName = "";
+    bool isPlayer=false;
     List<string> preFixMsg = new List<string> { "hello","test","bye","call you later"};
     //static GameObject instance;
     // Start is called before the first frame update
@@ -55,6 +56,14 @@ public class GameSystemManager : MonoBehaviour
             else if (go.name == "btnReplay")
             {
                 btnReplay = go;
+            }
+            else if (go.name == "txtReplay")
+            {
+                txtReplay = go;
+            }
+            else if (go.name == "pnlReplay")
+            {
+                pnlReplay = go;
             }
             //else if (go.name == "gameBoard")
             //    gameBoard = go;
@@ -123,9 +132,17 @@ public class GameSystemManager : MonoBehaviour
         
        
     }
+    public bool getIsPlayer()
+    {
+        return isPlayer;
+    }
     public void updateChat(string msg)
     {
-        chatBox.GetComponent<Text>().text += msg+"\n";
+        chatBox.GetComponent<TMP_Text>().text += msg+"\n";
+    }
+    public void updateReplay(string msg)
+    {
+        txtReplay.GetComponent<TMP_Text>().text += msg + "\n";
     }
     public void updateUserName(string name)
     {
@@ -135,11 +152,23 @@ public class GameSystemManager : MonoBehaviour
     public void LoadPlayer(List<string> list)
     {
         ddlPlayer.GetComponent<Dropdown>().ClearOptions();
+        foreach (string it in list)
+        {
+            if (it.Contains(currentPlayerName))
+            { 
+                list.Remove(it);
+                break;
+            }
+        }
         ddlPlayer.GetComponent<Dropdown>().AddOptions(list);
+       
     }
     public void ReplayButtonPressed()
     {
-
+        string msg = ClientToServerSignifiers.ReplayMsg + ","  + currentPlayerName;
+        Debug.Log("replay " + msg);
+        networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(msg);
+       
     }
     // Update is called once per frame
     void Update()
@@ -180,14 +209,16 @@ public class GameSystemManager : MonoBehaviour
     public void JoinButtonPressed()
     {
         string msg = ClientToServerSignifiers.JoinGammeRoomQueue+","+currentPlayerName;
+        isPlayer = true;
         networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(msg);
       //  ChangeState(GameStates.TicTacToe);
     }
     public void ObserveButtonPressed()
     {
         string msg = ClientToServerSignifiers.JoinAsObserver + ","+currentPlayerName;
+        isPlayer = false;
         networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(msg);
-        ChangeState(GameStates.Observer);
+        //ChangeState(GameStates.Observer);
     }
     public void CreateToggleChanged(bool newValue)
     {
@@ -226,8 +257,10 @@ public class GameSystemManager : MonoBehaviour
         txtCMsg.SetActive(false);
         chatBox.SetActive(false);
         pnlChat.SetActive(false);
-        
-       
+        txtReplay.SetActive(false);
+        btnReplay.SetActive(false);
+        pnlReplay.SetActive(false);
+        lblInfo.SetActive(false);
         if (newState == GameStates.LoginMenu)
         {
             // LoginSys.SetActive(true);
@@ -240,6 +273,7 @@ public class GameSystemManager : MonoBehaviour
         }
         else if (newState == GameStates.MainMenu)
         {
+            lblInfo.SetActive(true);
             //JoinSys.SetActive(true);
             btnJoin.SetActive(true);
             btnJoinObserver.SetActive(true);
@@ -255,8 +289,10 @@ public class GameSystemManager : MonoBehaviour
             txtCMsg.SetActive(true);
             chatBox.SetActive(true);
             pnlChat.SetActive(true);
-            
-           
+
+            txtReplay.SetActive(true);
+            btnReplay.SetActive(true);
+            pnlReplay.SetActive(true);
         }
         else if (newState == GameStates.WaitingInQueue)
         {
@@ -267,9 +303,10 @@ public class GameSystemManager : MonoBehaviour
         }
         else if (newState == GameStates.TicTacToe)
         {
+            lblInfo.SetActive(true);
             //btnPlay.SetActive(true);
             //MsgSend.SetActive(true);
-             txtMsg.SetActive(true);
+            txtMsg.SetActive(true);
             btnSend.SetActive(true);
             //PMsgSend.SetActive(true);
             btnSendPrefixMsg.SetActive(true);
@@ -281,12 +318,18 @@ public class GameSystemManager : MonoBehaviour
             chatBox.SetActive(true);
             pnlChat.SetActive(true);
 
-            
+            txtReplay.SetActive(true);
+            btnReplay.SetActive(true);
+            pnlReplay.SetActive(true);
         }
         else if (newState==GameStates.Observer)
         {
+            lblInfo.SetActive(true);
             chatBox.SetActive(true);
             pnlChat.SetActive(true);
+            txtReplay.SetActive(true);
+            btnReplay.SetActive(true);
+            pnlReplay.SetActive(true);
         }
     }
 

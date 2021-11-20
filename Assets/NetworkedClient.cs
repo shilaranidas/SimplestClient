@@ -146,7 +146,10 @@ public class NetworkedClient : MonoBehaviour
                 //waiting for other player
                 if(csv.Length>2)
                 gameSystemManager.GetComponent<GameSystemManager>().updateChat("join player "+csv[2]);
-                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+                if (gameSystemManager.GetComponent<GameSystemManager>().getIsPlayer())
+                    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+                else
+                    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.Observer);
             }
             //else if (signifier == ServerToClientSignifiers.JoinedPlayAsOpponent)
             //{
@@ -171,27 +174,48 @@ public class NetworkedClient : MonoBehaviour
                         otherPlayerList.Add(csv[3]);
                 }
                 gameSystemManager.GetComponent<GameSystemManager>().LoadPlayer(otherPlayerList);
-                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+                if (gameSystemManager.GetComponent<GameSystemManager>().getIsPlayer())
+                    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+                else
+                    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.Observer);
             }
             else if (signifier == ServerToClientSignifiers.ReceiveMsg)
             {
                 Debug.Log("rece" + csv[2]);
                 if (csv.Length > 3)
                     gameSystemManager.GetComponent<GameSystemManager>().updateChat(csv[3]+":"+csv[2]);
-                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+                if (gameSystemManager.GetComponent<GameSystemManager>().getIsPlayer())
+                    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+                else
+                    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.Observer);
             }
             else if (signifier == ServerToClientSignifiers.ReceiveCMsg)
             {
                // Debug.Log("rece" + csv[1]);
                 if (csv.Length > 3)
                     gameSystemManager.GetComponent<GameSystemManager>().updateChat(csv[3]+":"+csv[2]);
-                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+                if (gameSystemManager.GetComponent<GameSystemManager>().getIsPlayer())
+                    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+                else
+                    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.Observer);
             }
             else if (signifier == ServerToClientSignifiers.someoneJoinedAsObserver)
             {
-                if (csv.Length > 1)
-                    gameSystemManager.GetComponent<GameSystemManager>().updateChat("Some one has joined as Observer " + csv[1]);
-                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+                if (csv.Length > 2)
+                    gameSystemManager.GetComponent<GameSystemManager>().updateChat("Some one has joined as Observer " + csv[2]);
+                if (gameSystemManager.GetComponent<GameSystemManager>().getIsPlayer())
+                    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+                else
+                    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.Observer);
+            }
+            else if (signifier==ServerToClientSignifiers.ReplayMsg)
+            {
+                if(csv.Length>1)
+                    gameSystemManager.GetComponent<GameSystemManager>().updateReplay(csv[1]);
+                if(gameSystemManager.GetComponent<GameSystemManager>().getIsPlayer())
+                    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+                else
+                    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.Observer);
             }
         }
     }
@@ -213,6 +237,7 @@ public static class ClientToServerSignifiers
     public const int SendPrefixMsg = 6;
     public const int JoinAsObserver = 7;
     public const int SendClientMsg = 8;
+    public const int ReplayMsg = 9;
 }
 public static class ServerToClientSignifiers
 {
@@ -226,4 +251,5 @@ public static class ServerToClientSignifiers
     public const int someoneJoinedAsObserver = 8;
     public const int JoinedPlay = 9;
     public const int ReceiveCMsg = 10;
+    public const int ReplayMsg = 11;
 }
