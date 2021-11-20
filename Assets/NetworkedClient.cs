@@ -116,49 +116,84 @@ public class NetworkedClient : MonoBehaviour
         Debug.Log("msg recieved = " + msg + ".  connection id = " + id);
         //chk message 
         string[] csv = msg.Split(',');
-        int signifier = int.Parse(csv[0]);
-        if (signifier == ServerToClientSignifiers.LoginComplete)
+        if (csv.Length > 0)
         {
-            Debug.Log("Login successful");
-            gameSystemManager.GetComponent<GameSystemManager>().updateUserName(csv[1]);
-            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.MainMenu);
+            int signifier = int.Parse(csv[0]);
+            if (signifier == ServerToClientSignifiers.LoginComplete)
+            {
+                Debug.Log("Login successful");
+                if (csv.Length > 1)
+                {
+                    gameSystemManager.GetComponent<GameSystemManager>().updateUserName(csv[1]);                    
+                }
+                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.MainMenu);
+            }
+            else if (signifier == ServerToClientSignifiers.LoginFailed)
+                Debug.Log("Login Failed");
+            else if (signifier == ServerToClientSignifiers.AccountCreationComplete)
+            {
+                Debug.Log("account creation successful");
+                if (csv.Length > 1)
+                { 
+                    gameSystemManager.GetComponent<GameSystemManager>().updateUserName(csv[1]);                    
+                }
+                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.MainMenu);
+            }
+            else if (signifier == ServerToClientSignifiers.AccountCreationFailed)
+                Debug.Log("Account creation failed");
+            else if (signifier == ServerToClientSignifiers.JoinedPlay)
+            {
+                //waiting for other player
+                if(csv.Length>2)
+                gameSystemManager.GetComponent<GameSystemManager>().updateChat("join player "+csv[2]);
+                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+            }
+            //else if (signifier == ServerToClientSignifiers.JoinedPlayAsOpponent)
+            //{
+            //    //waiting for other player
+            //    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.);
+            //}
+            else if (signifier == ServerToClientSignifiers.GameStart)
+            {
+                Debug.Log("players1: " + csv[1]);
+                Debug.Log("players2: " + csv[2]);
+                Debug.Log("players3: " + csv[3]);
+                //showing list of player
+                //2 opponent player
+                List<string> otherPlayerList = new List<string>();
+                if (csv.Length > 3)
+                {
+                    if(!otherPlayerList.Contains(csv[1]))
+                        otherPlayerList.Add(csv[1]);
+                    if (!otherPlayerList.Contains(csv[2]))
+                        otherPlayerList.Add(csv[2]);
+                    if (!otherPlayerList.Contains(csv[3]))
+                        otherPlayerList.Add(csv[3]);
+                }
+                gameSystemManager.GetComponent<GameSystemManager>().LoadPlayer(otherPlayerList);
+                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+            }
+            else if (signifier == ServerToClientSignifiers.ReceiveMsg)
+            {
+                Debug.Log("rece" + csv[2]);
+                if (csv.Length > 3)
+                    gameSystemManager.GetComponent<GameSystemManager>().updateChat(csv[3]+":"+csv[2]);
+                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+            }
+            else if (signifier == ServerToClientSignifiers.ReceiveCMsg)
+            {
+               // Debug.Log("rece" + csv[1]);
+                if (csv.Length > 3)
+                    gameSystemManager.GetComponent<GameSystemManager>().updateChat(csv[3]+":"+csv[2]);
+                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+            }
+            else if (signifier == ServerToClientSignifiers.someoneJoinedAsObserver)
+            {
+                if (csv.Length > 1)
+                    gameSystemManager.GetComponent<GameSystemManager>().updateChat("Some one has joined as Observer " + csv[1]);
+                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
+            }
         }
-        else if (signifier == ServerToClientSignifiers.LoginFailed)
-            Debug.Log("Login Failed");
-        else if (signifier == ServerToClientSignifiers.AccountCreationComplete)
-        {
-            Debug.Log("account creation successful");
-            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.MainMenu);
-        }
-        else if (signifier == ServerToClientSignifiers.AccountCreationFailed)
-            Debug.Log("Account creation failed");
-        else if (signifier == ServerToClientSignifiers.OpponentPlay)
-        {
-            //waiting for other player
-            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
-        }
-        //else if (signifier == ServerToClientSignifiers.JoinedPlayAsOpponent)
-        //{
-        //    //waiting for other player
-        //    gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.);
-        //}
-        else if (signifier == ServerToClientSignifiers.GameStart)
-        { 
-            Debug.Log("Opponent player: " + csv[1]);
-            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
-        }
-        else if(signifier== ServerToClientSignifiers.ReceiveMsg)
-        {
-            Debug.Log("rece" + csv[1]);
-            gameSystemManager.GetComponent<GameSystemManager>().updateChat(csv[1]);
-            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
-        }
-        else if (signifier == ServerToClientSignifiers.someoneJoinedAsObserver)
-        {
-            gameSystemManager.GetComponent<GameSystemManager>().updateChat("Some one has joined as Observer "+csv[1]);
-            gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TicTacToe);
-        }
-
     }
 
     public bool IsConnected()
@@ -177,6 +212,7 @@ public static class ClientToServerSignifiers
     public const int SendMsg = 5;
     public const int SendPrefixMsg = 6;
     public const int JoinAsObserver = 7;
+    public const int SendClientMsg = 8;
 }
 public static class ServerToClientSignifiers
 {
@@ -188,5 +224,6 @@ public static class ServerToClientSignifiers
     public const int GameStart = 6;
     public const int ReceiveMsg = 7;
     public const int someoneJoinedAsObserver = 8;
-
+    public const int JoinedPlay = 9;
+    public const int ReceiveCMsg = 10;
 }
