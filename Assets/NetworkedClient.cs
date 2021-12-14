@@ -85,7 +85,7 @@ public class NetworkedClient : MonoBehaviour
             hostID = NetworkTransport.AddHost(topology, 0);
             Debug.Log("Socket open.  Host ID = " + hostID);
 
-            connectionID = NetworkTransport.Connect(hostID, "192.168.43.103", socketPort, 0, out error); // server is local on network
+            connectionID = NetworkTransport.Connect(hostID, "10.0.0.229", socketPort, 0, out error); // server is local on network
 
             if (error == 0)
             {
@@ -280,9 +280,27 @@ public class NetworkedClient : MonoBehaviour
                 else
                     gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.Observer);
             }
+            else if (signifier == ServerToClientSignifiers.ReplayPlay)//msg format: signifier, turn,valie
+            {
+                //1st player X                
+
+
+                //StartCoroutine(DelayCoroutine(csv[1], csv[2]));
+
+                gameSystemManager.GetComponent<GameSystemManager>().setTextButton(int.Parse(csv[1]), csv[2]);
+                
+               
+                int nex = int.Parse(csv[3]);
+                nex++;
+                if(csv[2]=="X") 
+                    SendMessageToHost(ClientToServerSignifiers.ReplayPlay + ","+ nex+",O");
+                else
+                    SendMessageToHost(ClientToServerSignifiers.ReplayPlay + "," + nex + ",X");
+                gameSystemManager.GetComponent<GameSystemManager>().ChangeState(GameStates.TickTacToeReplay);
+            }
         }
     }
-
+    
     public bool IsConnected()
     {
         return isConnected;
@@ -303,6 +321,7 @@ public static class ClientToServerSignifiers
     public const int ReplayMsg = 9;
     public const int JoinDGameRoomQueue = 10;
     public const int JoinDAsObserver = 11;
+    public const int ReplayPlay = 12;
 }
 public static class ServerToClientSignifiers
 {
@@ -320,4 +339,5 @@ public static class ServerToClientSignifiers
     public const int DGameStart = 12;
     public const int SelfPlay = 13;
     public const int OtherPlay = 14;
+    public const int ReplayPlay = 15;
 }

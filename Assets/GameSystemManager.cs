@@ -365,7 +365,27 @@ public class GameSystemManager : MonoBehaviour
     }
     public void ReplayButtonPressed()
     {
-        string msg = ClientToServerSignifiers.ReplayMsg + ","  + currentPlayerName;
+        string msg = "";
+        
+        if (chk2player.GetComponent<Toggle>().isOn)
+        {
+            btn11.GetComponentInChildren<Text>().text = "_";
+            btn12.GetComponentInChildren<Text>().text = "_";
+            btn13.GetComponentInChildren<Text>().text = "_";
+            btn21.GetComponentInChildren<Text>().text = "_";
+            btn22.GetComponentInChildren<Text>().text = "_";
+            btn23.GetComponentInChildren<Text>().text = "_";
+            btn31.GetComponentInChildren<Text>().text = "_";
+            btn32.GetComponentInChildren<Text>().text = "_";
+            btn33.GetComponentInChildren<Text>().text = "_";
+            msg = ClientToServerSignifiers.ReplayPlay + "," + "0,X";
+        }
+        else
+        {
+            msg = ClientToServerSignifiers.ReplayMsg + "," + currentPlayerName;
+        }
+
+      
         Debug.Log("replay " + msg);
         networkedClient.GetComponent<NetworkedClient>().SendMessageToHost(msg);
        
@@ -551,6 +571,7 @@ public class GameSystemManager : MonoBehaviour
         else if (newState == GameStates.TickTacToePlay)
         {
             lblInfo.SetActive(true);
+            btnReplay.SetActive(true);
             //btnPlay.SetActive(true);
             //MsgSend.SetActive(true);
             //txtMsg.SetActive(true);
@@ -601,8 +622,8 @@ public class GameSystemManager : MonoBehaviour
         {
             chatBox.SetActive(true);
             pnlChat.SetActive(true);
-
-           // txtReplay.SetActive(true);
+            btnReplay.SetActive(true);
+            // txtReplay.SetActive(true);
             //btnReplay.SetActive(true);
             //pnlReplay.SetActive(true);
             btn11.SetActive(true);
@@ -623,6 +644,36 @@ public class GameSystemManager : MonoBehaviour
             btn31.GetComponent<Button>().interactable = false;
             btn32.GetComponent<Button>().interactable = false;
             btn33.GetComponent<Button>().interactable = false;
+           
+        }
+        else if (newState == GameStates.TickTacToeReplay)
+        {
+            chatBox.SetActive(true);
+            pnlChat.SetActive(true);
+            btnReplay.SetActive(true);
+            // txtReplay.SetActive(true);
+            //btnReplay.SetActive(true);
+            //pnlReplay.SetActive(true);
+            btn11.SetActive(true);
+            btn12.SetActive(true);
+            btn13.SetActive(true);
+            btn21.SetActive(true);
+            btn22.SetActive(true);
+            btn23.SetActive(true);
+            btn31.SetActive(true);
+            btn32.SetActive(true);
+            btn33.SetActive(true);
+            
+            btn11.GetComponent<Button>().interactable = false;
+            btn12.GetComponent<Button>().interactable = false;
+            btn13.GetComponent<Button>().interactable = false;
+            btn21.GetComponent<Button>().interactable = false;
+            btn22.GetComponent<Button>().interactable = false;
+            btn23.GetComponent<Button>().interactable = false;
+            btn31.GetComponent<Button>().interactable = false;
+            btn32.GetComponent<Button>().interactable = false;
+            btn33.GetComponent<Button>().interactable = false;
+
         }
         else if (newState == GameStates.Observer)
         {
@@ -665,4 +716,5 @@ static public class GameStates
     public const int TickTacToePlay = 6;
     public const int TickTacToeEnd = 6;
     public const int Observer = 7;
+    public const int TickTacToeReplay = 6;
 }
